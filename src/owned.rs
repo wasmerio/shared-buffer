@@ -94,6 +94,78 @@ impl PartialEq for OwnedBuffer {
     }
 }
 
+impl PartialEq<[u8]> for OwnedBuffer {
+    fn eq(&self, other: &[u8]) -> bool {
+        self.as_slice() == other
+    }
+}
+
+impl PartialEq<&[u8]> for OwnedBuffer {
+    fn eq(&self, other: &&[u8]) -> bool {
+        self.as_slice() == *other
+    }
+}
+
+impl<const N: usize> PartialEq<[u8; N]> for OwnedBuffer {
+    fn eq(&self, other: &[u8; N]) -> bool {
+        self.as_slice() == other
+    }
+}
+
+impl<const N: usize> PartialEq<&[u8; N]> for OwnedBuffer {
+    fn eq(&self, other: &&[u8; N]) -> bool {
+        self.as_slice() == *other
+    }
+}
+
+impl PartialEq<Vec<u8>> for OwnedBuffer {
+    fn eq(&self, other: &Vec<u8>) -> bool {
+        self.as_slice() == other
+    }
+}
+
+impl PartialEq<&Vec<u8>> for OwnedBuffer {
+    fn eq(&self, other: &&Vec<u8>) -> bool {
+        self.as_slice() == *other
+    }
+}
+
+impl PartialEq<OwnedBuffer> for [u8] {
+    fn eq(&self, other: &OwnedBuffer) -> bool {
+        other == self
+    }
+}
+
+impl PartialEq<OwnedBuffer> for &[u8] {
+    fn eq(&self, other: &OwnedBuffer) -> bool {
+        other == self
+    }
+}
+
+impl<const N: usize> PartialEq<OwnedBuffer> for [u8; N] {
+    fn eq(&self, other: &OwnedBuffer) -> bool {
+        other == self
+    }
+}
+
+impl<const N: usize> PartialEq<OwnedBuffer> for &[u8; N] {
+    fn eq(&self, other: &OwnedBuffer) -> bool {
+        other == self
+    }
+}
+
+impl PartialEq<OwnedBuffer> for Vec<u8> {
+    fn eq(&self, other: &OwnedBuffer) -> bool {
+        other == self
+    }
+}
+
+impl PartialEq<OwnedBuffer> for &Vec<u8> {
+    fn eq(&self, other: &OwnedBuffer) -> bool {
+        other == self
+    }
+}
+
 impl<'a> IntoIterator for &'a OwnedBuffer {
     type Item = &'a u8;
     type IntoIter = std::slice::Iter<'a, u8>;
