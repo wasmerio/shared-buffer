@@ -1,10 +1,10 @@
 # shared-buffer
 
-[![Continuous integration](https://github.com/wasmerio/shared-buffer/workflows/Continuous%20Integration/badge.svg?branch=main)](https://github.com/wasmerio/shared-buffer/actions)
+[![Continuous Integration](https://github.com/wasmerio/shared-buffer/actions/workflows/ci.yml/badge.svg)](https://github.com/wasmerio/shared-buffer/actions/workflows/ci.yml)
 
 ([API Docs][api-docs])
 
-> **TODO:** Write up an interesting description.
+An abstraction over buffers backed by memory-mapped files or bytes in memory.
 
 ## License
 
