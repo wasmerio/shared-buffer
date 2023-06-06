@@ -43,6 +43,7 @@ impl MmappedSlice {
     }
 
     #[inline]
+    #[track_caller]
     pub fn slice(&self, range: impl RangeBounds<usize>) -> Self {
         let (start, end) = bounds(self.start, self.end, range);
         MmappedSlice {
@@ -53,23 +54,35 @@ impl MmappedSlice {
     }
 }
 
+#[track_caller]
 fn bounds(
     original_start: usize,
     original_end: usize,
     range: impl RangeBounds<usize>,
 ) -> (usize, usize) {
-    let start = match range.start_bound() {
+    let start_offset = match range.start_bound() {
         Bound::Included(&index) => index,
         Bound::Excluded(index) => index.saturating_sub(1),
-        Bound::Unbounded => original_start,
+        Bound::Unbounded => 0,
     };
+    let start = original_start + start_offset;
+
     let end = match range.end_bound() {
-        Bound::Included(index) => index.saturating_add(1),
-        Bound::Excluded(&index) => index,
+        Bound::Included(index) => original_start + index.saturating_add(1),
+        Bound::Excluded(&index) => original_start + index,
         Bound::Unbounded => original_end,
     };
-    assert!(start >= original_start);
-    assert!(end <= original_end);
+
+    assert!(start <= end, "{start} <= {end}");
+    assert!(
+        start >= original_start,
+        "Start offset out of bounds: {start} >= {original_start}"
+    );
+    assert!(
+        end <= original_end,
+        "End offset out of bounds: {end} <= {original_end}"
+    );
+
     (start, end)
 }
 
@@ -137,7 +150,7 @@ mod tests {
         let (start, end) = bounds(1, 10, ..5);
 
         assert_eq!(start, 1);
-        assert_eq!(end, 5);
+        assert_eq!(end, 1 + 5);
     }
 
     #[test]
@@ -145,14 +158,14 @@ mod tests {
         let (start, end) = bounds(1, 10, ..=5);
 
         assert_eq!(start, 1);
-        assert_eq!(end, 6);
+        assert_eq!(end, 1 + 6);
     }
 
     #[test]
     fn range_from() {
         let (start, end) = bounds(1, 10, 5..);
 
-        assert_eq!(start, 5);
+        assert_eq!(start, 1 + 5);
         assert_eq!(end, 10);
     }
 
@@ -160,40 +173,40 @@ mod tests {
     fn range() {
         let (start, end) = bounds(1, 10, 5..8);
 
-        assert_eq!(start, 5);
-        assert_eq!(end, 8);
+        assert_eq!(start, 1 + 5);
+        assert_eq!(end, 1 + 8);
     }
 
     #[test]
     fn range_at_end() {
-        let (start, end) = bounds(1, 10, 5..10);
+        let (start, end) = bounds(1, 10, 5..9);
 
-        assert_eq!(start, 5);
-        assert_eq!(end, 10);
+        assert_eq!(start, 1 + 5);
+        assert_eq!(end, 1 + 9);
     }
 
     #[test]
     fn range_at_start() {
         let (start, end) = bounds(1, 10, 1..5);
 
-        assert_eq!(start, 1);
-        assert_eq!(end, 5);
+        assert_eq!(start, 1 + 1);
+        assert_eq!(end, 1 + 5);
     }
 
     #[test]
     fn range_inclusive() {
         let (start, end) = bounds(1, 10, 1..=5);
 
-        assert_eq!(start, 1);
-        assert_eq!(end, 6);
+        assert_eq!(start, 1 + 1);
+        assert_eq!(end, 1 + 5 + 1);
     }
 
     #[test]
     fn range_inclusive_at_end() {
-        let (start, end) = bounds(1, 10, 5..=9);
+        let (start, end) = bounds(1, 10, 5..=8);
 
-        assert_eq!(start, 5);
-        assert_eq!(end, 10);
+        assert_eq!(start, 1 + 5);
+        assert_eq!(end, 1 + 8 + 1);
     }
 
     #[test]
@@ -217,5 +230,21 @@ mod tests {
         let slice = mmap.slice(..5);
 
         assert_eq!(slice.as_slice(), b"Hello");
+    }
+
+    #[test]
+    fn slicing_is_relative_to_the_slice_not_the_overall_file() {
+        let mut temp = tempfile::tempfile().unwrap();
+        let content = "Hello, World!";
+        temp.write_all(content.as_ref()).unwrap();
+        let mmap = MmappedSlice::from_file(&temp).unwrap();
+        let slice = mmap.slice(3..);
+
+        let sub_slice = slice.slice(4..7);
+
+        assert_eq!(
+            std::str::from_utf8(sub_slice.as_slice()).unwrap(),
+            &content[3 + 4..3 + 7]
+        );
     }
 }
