@@ -128,7 +128,7 @@ dependencies = [
 
 [[package]]
 name = "shared-buffer"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "bytes",
  "memmap2",
