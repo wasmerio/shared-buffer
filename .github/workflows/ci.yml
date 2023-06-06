@@ -12,18 +12,26 @@ env:
 
 jobs:
   check:
-    name: Compile and Test
-    runs-on: ubuntu-latest
+    name: Compile and Test (${{ matrix.os }})
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: ${{ env.MSRV }}
           override: true
+      - name: Install Nextest
+        uses: taiki-e/install-action@nextest
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Type Checking
         uses: actions-rs/cargo@v1
         with:
@@ -37,8 +45,8 @@ jobs:
       - name: Test
         uses: actions-rs/cargo@v1
         with:
-          command: test
-          args: --workspace --verbose --locked
+          command: nextest
+          args: run --workspace --verbose --locked
 
   lints:
     name: Linting and Formatting
@@ -101,7 +109,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           jobs: |
-            Compile and Test
+            Compile and Test (ubuntu-latest)
+            Compile and Test (macos-latest)
+            Compile and Test (windows-latest)
           message: |
             Make sure you keep an eye on build times!
 
