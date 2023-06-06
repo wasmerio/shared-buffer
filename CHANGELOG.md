@@ -12,6 +12,8 @@ change, where applicable.
 
 ## [Unreleased] - ReleaseDate
 
+## [0.1.2] - 2023-06-06
+
 ### Fixed
 
 - When slicing a mmapped buffer, the resulting offsets would be relative to the
@@ -32,6 +34,7 @@ change, where applicable.
   (`bytes::Bytes`) or a mmapped buffer (`memmap2::Mmap`)
 
 <!-- next-url -->
-[Unreleased]: https://github.com/wasmerio/shared-buffer/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/wasmerio/shared-buffer/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/wasmerio/shared-buffer/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/wasmerio/shared-buffer/compare/v0.1.0..v0.1.1
 [0.1.0]: https://github.com/wasmerio/shared-buffer/compare/6c299238..v0.1.0
