@@ -261,6 +261,12 @@ impl From<&Vec<u8>> for OwnedBuffer {
     }
 }
 
+impl From<OwnedBuffer> for Vec<u8> {
+    fn from(value: OwnedBuffer) -> Self {
+        value.to_vec()
+    }
+}
+
 impl From<Repr> for OwnedBuffer {
     fn from(repr: Repr) -> Self {
         OwnedBuffer { repr }
