@@ -12,6 +12,9 @@ change, where applicable.
 
 ## [Unreleased] - ReleaseDate
 
+- Added an `impl From<OwnedBuffer> for Vec<u8>`
+  ([#3](https://github.com/wasmerio/shared-buffer/pull/3))
+
 ## [0.1.2] - 2023-06-06
 
 ### Fixed
