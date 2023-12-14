@@ -12,6 +12,10 @@ change, where applicable.
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Added a `From<Cow<'_, [u8]>>` impl for `OwnedBuffer` ([#5](https://github.com/wasmerio/shared-buffer/pull/5)
+
 ## [0.1.3] - 2023-06-07
 
 - Added an `impl From<OwnedBuffer> for Vec<u8>`
