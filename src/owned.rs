@@ -1,4 +1,5 @@
 use std::{
+    borrow::Cow,
     fs::File,
     hash::Hash,
     ops::{Deref, Index, RangeBounds},
@@ -246,6 +247,15 @@ impl From<Bytes> for OwnedBuffer {
 impl From<&[u8]> for OwnedBuffer {
     fn from(value: &[u8]) -> Self {
         value.to_vec().into()
+    }
+}
+
+impl From<Cow<'_, [u8]>> for OwnedBuffer {
+    fn from(value: Cow<'_, [u8]>) -> Self {
+        match value {
+            Cow::Borrowed(value) => value.into(),
+            Cow::Owned(value) => value.into(),
+        }
     }
 }
 
